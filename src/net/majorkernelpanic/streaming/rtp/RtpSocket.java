@@ -115,6 +115,7 @@ public class RtpSocket implements Runnable {
 
 		try {
 		mSocket = new MulticastSocket();
+		mSocket.setSendBufferSize(2 * 1024 * 1024); 
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
