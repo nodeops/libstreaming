@@ -46,6 +46,7 @@ import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 import android.media.MediaRecorder;
+import android.os.Build;
 import android.os.Looper;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
@@ -369,6 +370,8 @@ public abstract class VideoStream extends MediaStream {
 			mMediaRecorder.start();
 
 		} catch (Exception e) {
+			mCamera.reconnect();
+			mCamera.startPreview();
 			throw new ConfNotSupportedException(e.getMessage());
 		}
 
@@ -566,6 +569,74 @@ public abstract class VideoStream extends MediaStream {
 	}
 
 	protected synchronized void createCamera() throws RuntimeException {
+		boolean whitelisted = false;
+        switch (Build.MODEL) {
+        // note2
+        case "SC-02E":
+        case "GT-N7100":
+        case "GT-N7100T":
+        case "GT-N7102":
+        case "GT-N7102i":
+        case "GT-N7108":
+        case "SCH-N719":
+        case "GT-N7105":
+        case "GT-N7105T":
+        case "SAMSUNG-SGH-I317":
+        case "SGH-I317M":
+        case "SGH-T889V":
+        case "GT-N7108D":
+        case "SHV-E250K":
+        case "SHV-E250L":
+        case "SHV-E250S":
+        case "SPH-L900":
+        case "SGH-T889":
+        case "SCH-R950":
+        case "SCH-I605":
+        // s3
+                // Galaxy S3
+        case "SGH-I748": 
+        case "SHV-E210K":
+        case "SHV-E210L":
+        case "SHV-E210S":
+        case "SAMSUNG-SGH-I747":
+        case "SGH-I747M":
+        case "SGH-T999V":
+        case "SCH-R530C":
+        case "Gravity":
+        case "SC-06D":
+        case "SGH-T999N":
+        case "SGH-T999L":
+        case "SCH-R530M":
+        case "SCH-L710":
+        case "SPH-L710":
+        case "SCH-S960L":
+        case "SCH-S968C":
+        case "SGH-T999":
+        case "SCH-R530U":
+        case "SCH-I535":
+        case "SCH-R530X":
+        case "GT-I9300":
+        case "GT-I9300T":
+        case "SCH-I939":
+        case "GT-I9308":
+        case "SCH-I939D":
+        case "GT-I9305":
+        case "GT-I9305N":
+        case "GT-I9305T":
+        case "GravityQuad":
+        case "SC-03E":
+        case "SHW-M440S":
+        case "SM-G920F":
+        case "SM-G920I":
+        case "SM-G920T":
+        case "SM-G925F":
+        case "SM-G925I":
+        case "XT1103":
+        case "XT1100":
+                whitelisted = true;
+        default:
+                break;
+}
 		if (mSurfaceView == null)
 			throw new InvalidSurfaceException("Invalid surface !");
 		if (mSurfaceView.getHolder() == null || !mSurfaceReady) 
@@ -599,6 +670,9 @@ public abstract class VideoStream extends MediaStream {
 				Parameters parameters = mCamera.getParameters();
 				if (parameters.getFlashMode()!=null) {
 					parameters.setFlashMode(mFlashEnabled?Parameters.FLASH_MODE_TORCH:Parameters.FLASH_MODE_OFF);
+				}
+				if (whitelisted == false) {
+					parameters.set( "cam_mode", 1 );
 				}
 				parameters.setRecordingHint(true);
 				mCamera.setParameters(parameters);
